@@ -1,0 +1,224 @@
+<div class="header">
+  <div class="title">
+    <h1>Tests GUI</h1>
+    <div class="hideToggles">
+      <button
+        mat-mini-fab
+        color="primary"
+        class="upload-button"
+        (click)="toggleHideInputs()"
+      >
+        <mat-icon>{{ hideInputs ? "visibility" : "visibility_off" }}</mat-icon>
+      </button>
+      <button
+        mat-mini-fab
+        color="secondary"
+        class="upload-button"
+        (click)="toggleHideMetadata()"
+      >
+        <mat-icon>{{
+          hideMetadata ? "visibility" : "visibility_off"
+        }}</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="inputs" *ngIf="!hideInputs">
+    <input
+      type="file"
+      class="file-input"
+      (change)="parseFiles($event)"
+      #fileInput
+    />
+
+    <div class="file-upload" (click)="fileInput.click()">
+      <button mat-mini-fab color="primary" class="upload-button">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+
+      {{ ($fileName | async) || "No file uploaded yet." }}
+    </div>
+
+    <mat-checkbox [formControl]="useFib" *ngIf="false"
+      >Use Fibonacci-based summation</mat-checkbox
+    >
+
+    <mat-form-field *ngIf="false">
+      <mat-label>Combine method</mat-label>
+      <mat-select
+        required
+        [value]="$combineMethod | async"
+        (selectionChange)="setCombineMethod($event)"
+      >
+        <mat-option value="sum">Sum</mat-option>
+        <mat-option value="max">Max</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="scale-inputs">
+      <mat-form-field class="scale-field" subscriptSizing="dynamic">
+        <mat-label>User value</mat-label>
+        <input matInput type="number" step="0.1" [formControl]="userValueS" />
+        @if (userValueS.value !== defaultS) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="userValueS.reset()"
+        >
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+      <mat-form-field class="scale-field" subscriptSizing="dynamic">
+        <mat-label>Complexity</mat-label>
+        <input matInput type="number" step="0.1" [formControl]="complexityS" />
+        @if (complexityS.value !== defaultS) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="complexityS.reset()"
+        >
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+      <mat-form-field class="scale-field" subscriptSizing="dynamic">
+        <mat-label>Stability</mat-label>
+        <input matInput type="number" step="0.1" [formControl]="stabilityS" />
+        @if (stabilityS.value !== defaultS) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="stabilityS.reset()"
+        >
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+      <mat-form-field class="scale-field" subscriptSizing="dynamic">
+        <mat-label>Effort</mat-label>
+        <input matInput type="number" step="0.1" [formControl]="effortS" />
+        @if (effortS.value !== defaultEffortS) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="effortS.reset()"
+        >
+          <mat-icon>restart_alt</mat-icon>
+        </button>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="scale-field" subscriptSizing="dynamic">
+      <mat-label>Limit</mat-label>
+      <input matInput type="number" step="1" [formControl]="limitS" />
+      @if (limitS.value) {
+      <button
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="limitS.reset()"
+      >
+        <mat-icon>restart_alt</mat-icon>
+      </button>
+      }
+    </mat-form-field>
+  </div>
+</div>
+
+<div class="content">
+  <div class="tests" *ngLet="$useFib | async as useFib">
+    <mat-tab-group (selectedTabChange)="handleTypeChange($event)">
+      <mat-tab label="Unit tests"></mat-tab>
+      <mat-tab label="Functional tests"></mat-tab>
+    </mat-tab-group>
+
+    <!-- <mat-button-toggle-group
+      class="toggle-group"
+      (change)="handleTypeChange($event)"
+      *ngLet="$type | async as type"
+    >
+      <mat-button-toggle
+        [checked]="type === TestType.UNIT"
+        [value]="TestType.UNIT"
+        >Unit</mat-button-toggle
+      >
+      <mat-button-toggle
+        [checked]="type === TestType.FUNCTIONAL"
+        [value]="TestType.FUNCTIONAL"
+        >Functional</mat-button-toggle
+      >
+    </mat-button-toggle-group> -->
+    <mat-card
+      class="test-card"
+      *ngFor="let test of $tests | async"
+      [class.unit]="test.testType === 'UNIT'"
+      [class.functional]="test.testType === 'FUNCTIONAL'"
+    >
+      <mat-card-header class="test-header">
+        <mat-card-title class="test-title"
+          >{{
+            test.testType === "FUNCTIONAL"
+              ? "Functional test for:"
+              : "Unit test for:"
+          }}
+          {{ test.title }}</mat-card-title
+        >
+        <span *ngIf="!hideMetadata && test.testType === 'UNIT'"
+          >Complexity: <b>{{ test.complexity }}</b></span
+        >
+      </mat-card-header>
+      <mat-card-content *ngIf="!hideMetadata">
+        <ng-container *ngIf="false && !hideInputs"
+          >Score: {{ parseScore(test.score) }}<br
+        /></ng-container>
+        <table *ngIf="test.testType === 'FUNCTIONAL'">
+          <tr>
+            <th>User value</th>
+            <th>Stability</th>
+            <th>Total complexity</th>
+          </tr>
+          <tr>
+            <td>{{ test.userValue }}</td>
+            <td>{{ test.stability }}</td>
+            <td>{{ test.complexity }}</td>
+          </tr>
+        </table>
+        <ng-container *ngIf="test.testType === 'UNIT'">
+          <!-- Complexity: {{ test.complexity }} <br />
+          User value: {{ test.userValue }} <br />
+          Fib user value: {{ test.fibUserValue }} <br />
+          Stability: {{ test.stability }} <br /> -->
+          <table
+            *ngIf="
+              test.functions && test.functions.length > 0;
+              else noFunctions
+            "
+          >
+            <tr>
+              <th>Function description</th>
+              <th>User value</th>
+              <th>Stability</th>
+            </tr>
+            <tr *ngFor="let function of test.functions">
+              <ng-container *ngIf="function !== null">
+                <td>{{ function.description }}</td>
+                <td>{{ function.userValue }}</td>
+                <td>{{ function.stability }}</td>
+              </ng-container>
+            </tr>
+          </table>
+          <ng-template #noFunctions> No functions </ng-template>
+        </ng-container>
+      </mat-card-content>
+      <!-- <mat-card-actions>
+        <button mat-button color="primary">Mark as completed</button>
+      </mat-card-actions> -->
+    </mat-card>
+  </div>
+</div>

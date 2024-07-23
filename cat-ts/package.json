@@ -1,0 +1,16 @@
+{
+  "name": "ts-test",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "glob": "^10.3.12",
+    "typescript": "^5.4.5",
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.7",
+    "ts-node": "^10.9.2"
+  },
+  "packageManager": "yarn@4.1.1"
+}
